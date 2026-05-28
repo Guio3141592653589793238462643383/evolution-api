@@ -216,17 +216,17 @@ CREATE INDEX `Webhook_instanceId_idx` ON `Webhook`(`instanceId`);
 -- AddForeignKey
 ALTER TABLE `Pusher` ADD CONSTRAINT `Pusher_instanceId_fkey` FOREIGN KEY (`instanceId`) REFERENCES `Instance`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- RenameIndex
-ALTER TABLE `Chat` RENAME INDEX `Chat_instanceId_fkey` TO `Chat_instanceId_idx`;
+-- RenameIndex (MariaDB 10.4 compatible)
+ALTER TABLE `Chat` DROP INDEX `Chat_instanceId_fkey`, ADD INDEX `Chat_instanceId_idx` (`instanceId`);
 
--- RenameIndex
-ALTER TABLE `Contact` RENAME INDEX `Contact_instanceId_fkey` TO `Contact_instanceId_idx`;
+-- RenameIndex (MariaDB 10.4 compatible)
+ALTER TABLE `Contact` DROP INDEX `Contact_instanceId_fkey`, ADD INDEX `Contact_instanceId_idx` (`instanceId`);
 
--- RenameIndex
-ALTER TABLE `Message` RENAME INDEX `Message_instanceId_fkey` TO `Message_instanceId_idx`;
+-- RenameIndex (MariaDB 10.4 compatible)
+ALTER TABLE `Message` DROP INDEX `Message_instanceId_fkey`, ADD INDEX `Message_instanceId_idx` (`instanceId`);
 
--- RenameIndex
-ALTER TABLE `MessageUpdate` RENAME INDEX `MessageUpdate_instanceId_fkey` TO `MessageUpdate_instanceId_idx`;
+-- RenameIndex (MariaDB 10.4 compatible)
+ALTER TABLE `MessageUpdate` DROP INDEX `MessageUpdate_instanceId_fkey`, ADD INDEX `MessageUpdate_instanceId_idx` (`instanceId`);
 
--- RenameIndex
-ALTER TABLE `MessageUpdate` RENAME INDEX `MessageUpdate_messageId_fkey` TO `MessageUpdate_messageId_idx`;
+-- RenameIndex (MariaDB 10.4 compatible)
+ALTER TABLE `MessageUpdate` DROP INDEX `MessageUpdate_messageId_fkey`, ADD INDEX `MessageUpdate_messageId_idx` (`messageId`);

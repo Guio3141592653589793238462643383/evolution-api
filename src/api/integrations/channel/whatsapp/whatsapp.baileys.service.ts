@@ -524,9 +524,9 @@ export class BaileysStartupService extends ChannelStartupService {
     try {
       // Use raw SQL to avoid JSON path issues
       const webMessageInfo = (await this.prismaRepository.$queryRaw`
-        SELECT * FROM "Message"
-        WHERE "instanceId" = ${this.instanceId}
-        AND "key"->>'id' = ${key.id}
+        SELECT * FROM \`Message\`
+        WHERE \`instanceId\` = ${this.instanceId}
+        AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.id')) = ${key.id}
       `) as proto.IWebMessageInfo[];
 
       if (full) {
@@ -1638,9 +1638,9 @@ export class BaileysStartupService extends ChannelStartupService {
             const searchId = originalMessageId || key.id;
 
             const messages = (await this.prismaRepository.$queryRaw`
-              SELECT * FROM "Message"
-              WHERE "instanceId" = ${this.instanceId}
-              AND "key"->>'id' = ${searchId}
+              SELECT * FROM \`Message\`
+              WHERE \`instanceId\` = ${this.instanceId}
+              AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.id')) = ${searchId}
               LIMIT 1
             `) as any[];
             findMessage = messages[0] || null;
@@ -4736,13 +4736,13 @@ export class BaileysStartupService extends ChannelStartupService {
 
     // Use raw SQL to avoid JSON path issues
     const result = await this.prismaRepository.$executeRaw`
-      UPDATE "Message"
-      SET "status" = ${status[4]}
-      WHERE "instanceId" = ${this.instanceId}
-      AND "key"->>'remoteJid' = ${remoteJid}
-      AND ("key"->>'fromMe')::boolean = false
-      AND "messageTimestamp" <= ${timestamp}
-      AND ("status" IS NULL OR "status" = ${status[3]})
+      UPDATE \`Message\`
+      SET \`status\` = ${status[4]}
+      WHERE \`instanceId\` = ${this.instanceId}
+      AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.remoteJid')) = ${remoteJid}
+      AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.fromMe')) = 'false'
+      AND \`messageTimestamp\` <= ${timestamp}
+      AND (\`status\` IS NULL OR \`status\` = ${status[3]})
     `;
 
     if (result) {
@@ -4761,12 +4761,12 @@ export class BaileysStartupService extends ChannelStartupService {
       this.prismaRepository.chat.findFirst({ where: { remoteJid } }),
       // Use raw SQL to avoid JSON path issues
       this.prismaRepository.$queryRaw`
-        SELECT COUNT(*)::int as count FROM "Message"
-        WHERE "instanceId" = ${this.instanceId}
-        AND "key"->>'remoteJid' = ${remoteJid}
-        AND ("key"->>'fromMe')::boolean = false
-        AND "status" = ${status[3]}
-      `.then((result: any[]) => result[0]?.count || 0),
+        SELECT COUNT(*) as count FROM \`Message\`
+        WHERE \`instanceId\` = ${this.instanceId}
+        AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.remoteJid')) = ${remoteJid}
+        AND JSON_UNQUOTE(JSON_EXTRACT(\`key\`, '$.fromMe')) = 'false'
+        AND \`status\` = ${status[3]}
+      `.then((result: any[]) => Number(result[0]?.count) || 0),
     ]);
 
     if (chat && chat.unreadMessages !== unreadMessages) {
